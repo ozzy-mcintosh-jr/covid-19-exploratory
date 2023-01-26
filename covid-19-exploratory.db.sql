@@ -1,0 +1,87 @@
+BEGIN TRANSACTION;
+CREATE TABLE IF NOT EXISTS "CovidVaccinations" (
+	"iso_code"	TEXT,
+	"continent"	TEXT,
+	"location"	TEXT,
+	"date"	TEXT,
+	"total_tests"	TEXT,
+	"new_tests"	TEXT,
+	"total_tests_per_thousand"	TEXT,
+	"new_tests_per_thousand"	TEXT,
+	"new_tests_smoothed"	TEXT,
+	"new_tests_smoothed_per_thousand"	TEXT,
+	"positive_rate"	TEXT,
+	"tests_per_case"	TEXT,
+	"tests_units"	TEXT,
+	"total_vaccinations"	TEXT,
+	"people_vaccinated"	TEXT,
+	"people_fully_vaccinated"	TEXT,
+	"total_boosters"	TEXT,
+	"new_vaccinations"	TEXT,
+	"new_vaccinations_smoothed"	TEXT,
+	"total_vaccinations_per_hundred"	TEXT,
+	"people_vaccinated_per_hundred"	TEXT,
+	"people_fully_vaccinated_per_hundred"	TEXT,
+	"total_boosters_per_hundred"	TEXT,
+	"new_vaccinations_smoothed_per_million"	TEXT,
+	"new_people_vaccinated_smoothed"	TEXT,
+	"new_people_vaccinated_smoothed_per_hundred"	TEXT,
+	"stringency_index"	REAL,
+	"population_density"	REAL,
+	"median_age"	REAL,
+	"aged_65_older"	REAL,
+	"aged_70_older"	REAL,
+	"gdp_per_capita"	REAL,
+	"extreme_poverty"	TEXT,
+	"cardiovasc_death_rate"	REAL,
+	"diabetes_prevalence"	REAL,
+	"female_smokers"	TEXT,
+	"male_smokers"	TEXT,
+	"handwashing_facilities"	REAL,
+	"hospital_beds_per_thousand"	REAL,
+	"life_expectancy"	REAL,
+	"human_development_index"	REAL,
+	"excess_mortality_cumulative_absolute"	TEXT,
+	"excess_mortality_cumulative"	TEXT,
+	"excess_mortality"	TEXT,
+	"excess_mortality_cumulative_per_million"	TEXT
+);
+CREATE TABLE IF NOT EXISTS "CovidDeaths" (
+	"iso_code"	TEXT,
+	"continent"	TEXT,
+	"location"	TEXT,
+	"date"	INTEGER,
+	"population"	NUMERIC,
+	"total_cases"	NUMERIC,
+	"new_cases"	NUMERIC,
+	"new_cases_smoothed"	NUMERIC,
+	"total_deaths"	NUMERIC,
+	"new_deaths"	NUMERIC,
+	"new_deaths_smoothed"	NUMERIC,
+	"total_cases_per_million"	NUMERIC,
+	"new_cases_per_million"	NUMERIC,
+	"new_cases_smoothed_per_million"	NUMERIC,
+	"total_deaths_per_million"	NUMERIC,
+	"new_deaths_per_million"	NUMERIC,
+	"new_deaths_smoothed_per_million"	NUMERIC,
+	"reproduction_rate"	NUMERIC,
+	"icu_patients"	INTEGER,
+	"icu_patients_per_million"	NUMERIC,
+	"hosp_patients"	INTEGER,
+	"hosp_patients_per_million"	NUMERIC,
+	"weekly_icu_admissions"	INTEGER,
+	"weekly_icu_admissions_per_million"	NUMERIC,
+	"weekly_hosp_admissions"	NUMERIC,
+	"weekly_hosp_admissions_per_million"	NUMERIC
+);
+CREATE VIEW PopvsVacView AS
+SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations,
+    SUM(CAST(vac.new_vaccinations AS INTEGER)) OVER (PARTITION BY dea.location ORDER BY dea.location, dea.date) AS rolling_num_people_vaxxed,
+    (CAST(SUM(CAST(vac.new_vaccinations AS INTEGER)) OVER (PARTITION BY dea.location ORDER BY dea.location, dea.date) AS FLOAT)/CAST(population AS FLOAT)*100) AS PercentagePopvsVac
+FROM "CovidDeaths" AS dea
+JOIN "CovidVaccinations" AS vac
+ON dea.location = vac.location
+AND dea.date = vac.date
+WHERE dea.continent IS NOT NULL
+ORDER BY dea.location, dea.date ASC;
+COMMIT;
