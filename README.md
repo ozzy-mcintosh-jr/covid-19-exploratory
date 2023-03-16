@@ -26,6 +26,22 @@ Make sure to download the latest available data and import it into your SQL data
 
 ### Importing Data
 To import the data, you may use the import functionality of your SQL client or execute the following SQL commands:
+    -- Create the database
+    CREATE DATABASE covid_data_analysis;
+
+    -- Use the created database
+    USE covid_data_analysis;
+
+    -- Create the tables
+    CREATE TABLE CovidDeaths ( ... );
+    CREATE TABLE CovidVaccinations ( ... );
+    ...
+
+    -- Import the data
+    LOAD DATA INFILE 'CovidDeaths.csv' INTO TABLE CovidDeaths;
+    LOAD DATA INFILE 'CovidVaccinations.csv' INTO TABLE CovidVaccinations;
+    ...
+
 
 
 ### Analysis and Queries
