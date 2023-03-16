@@ -26,7 +26,7 @@ WHERE continent IS NOT NULL
 GROUP BY location
 ORDER BY TotalDeathCount DESC;
 
---Let's Break It Down By continent
+--Let's Break It Down By Continent
 
 -- Continents With Highest Death Count Per Population
 SELECT continent, MAX(CAST(total_deaths AS INTEGER)) AS TotalDeathCount
@@ -73,7 +73,7 @@ AS
 SELECT *, (CAST(rolling_num_people_vaxxed AS FLOAT)/CAST(population AS FLOAT)*100) 
 FROM PopvsVac;
 
----create view for tableau
+---Create view for tableau
 CREATE VIEW PopvsVacView AS
 SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations,
     SUM(CAST(vac.new_vaccinations AS INTEGER)) OVER (PARTITION BY dea.location ORDER BY dea.location, dea.date) AS rolling_num_people_vaxxed,
